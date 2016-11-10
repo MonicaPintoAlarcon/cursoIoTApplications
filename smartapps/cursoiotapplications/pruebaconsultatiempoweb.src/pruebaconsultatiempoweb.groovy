@@ -63,11 +63,15 @@ def consultarTiempoJSON(){
             def temp = resp.data.main.temp
             log.debug "temp: ${temp}"
         }
-        def estado = termostato.latestState("thermostatMode")
-        if (estado != 'cool' && temp > 27){
-        	termostato.cool()
+        
+        log.debug "termostato: ${termostato.currentThermostatMode}"
+        if (termostato.currentThermostatMode != 'heat' && temp < 10){
+        	termostato.heat()
         }
-        if (interruptor.latestState("switch") == 'off' && temp > 27){
+        
+        log.debug "interruptor: ${interruptor.currentSwitch}"
+        log.debug "interruptor: ${interruptor.switchState?.getValue()}"
+        if (interruptor.currentSwitch == 'off' && temp < 10){
             interruptor.on()
         }
     } catch (e) {
