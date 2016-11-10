@@ -88,7 +88,7 @@ def checkMotion() {
             log.debug "Motion has not stayed inactive long enough since last check ($elapsed ms):  doing nothing"
             //Esta línea no viene en la solución que da SmartThings, pero sin esto la luz podría quedarse encendida para siempre
             //Si no ha pasado el tiempo suficiente, volvemos a comprobarlo pasado nuevamente el número de minutos indicado por el usuario
-            //runIn(60*minutes,checkMotion)
+            runIn(60*minutes,checkMotion)
         }
     } else {
             // Motion active; just log it and do nothing

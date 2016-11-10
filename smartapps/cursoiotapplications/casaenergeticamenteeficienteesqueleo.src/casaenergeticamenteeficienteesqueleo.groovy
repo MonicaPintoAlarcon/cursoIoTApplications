@@ -49,20 +49,35 @@ def initialize() {
     subscribe(luces, "switch.off", apagarLuz)
     
     //COMPLETAR
+    state.numLuces = 0
+    runEvery30Minutes(comprobarLuces)
 }
 
 def encenderLuz(evt){
     //COMPLETAR	
+    state.numLuces = state.numLuces + 1
     log.debug "numLuces = $state.numLuces"
 }
 
 def apagarLuz(evt){
     //COMPLETAR	
+    state.numLuces = state.numLuces - 1
     log.debug "numLuces = $state.numLuces"    
 }
 
 def comprobarLuces(){
-
 //COMPLETAR
-
+	if (state.numLuces > 1){
+ 		//Buscar todas las luces que estén encendidas
+        def luzOn = luces.findAll { it?.latestValue("switch") == 'on'}
+        //Ordenarlas for fecha
+        def orden = luzOn.sort{it.latestState?.date}
+        //Apagar las que se encendieron primero
+        def i = 1
+        while (i<orden.size){
+        	orden[i].off()
+            i++
+        }
+    
+    }
 }
