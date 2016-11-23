@@ -49,13 +49,14 @@ def listSwitches(){
     switches.each {
       resp << [name: it.displayName, value: it.currentValue("switch")]
     }
+    log.debug resp
     return resp
 }
 
 def updateSwitches(){
     // use the built-in request object to get the command parameter
     def command = params.command
-
+	log.debug "$command"    
     // all switches have the command
     // execute the command on all switches
     // (note we can do this on the array - the command will be invoked on every element

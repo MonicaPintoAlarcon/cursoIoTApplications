@@ -64,7 +64,8 @@ def doorClosed(evt)
 }
 
 def doorOpenTooLong() {
-	def contactState = contact.currentState("contact")
+	//def contactState = contact.currentState("contact")
+    def contactState = contact.contactState
   
 	if (contactState.value == "open") {
     	//Devuelve el tiempo en milisegundos
