@@ -14,6 +14,7 @@
  *
  *  Author: SmartThings
  */
+ /* OMAHA, NE ZIP code: 68144*/
 definition(
     name: "When It's Going to Rain",
     namespace: "smartthings",
@@ -77,7 +78,7 @@ def scheduleCheck() {
 }
 
 private isStormy(json) {
-	def STORMY = ['rain', 'snow', 'showers', 'sprinkles', 'precipitation']
+	def STORMY = ['rain', 'snow', 'cloudy','showers', 'sprinkles', 'precipitation']
 
 	def forecast = json?.forecast?.txt_forecast?.forecastday?.first()
 	if (forecast) {

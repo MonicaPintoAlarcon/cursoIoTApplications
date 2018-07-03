@@ -41,19 +41,25 @@ def initialize() {
 
 def comprobarLuces(){
 
+	log.info luces[0]?.switchState.value //Devuelve el valor asociado al estado del dispositivo
+    log.info luces[0]?.currentSwitch //Devuelve lo mismo que lo anterior
+    log.info luces[0]?.currentState("switch").value
+    log.info luces[0]?.currentValue("switch")
     def numLucesOn = luces.count {it?.latestValue("switch") == 'on'}
-    log.debug "numLuces = $numLucesOn"
+    log.info "numLuces = $numLucesOn"
 	
     if (numLucesOn > 1) {
     	log.debug "Apaga alguna luz"
+        //Encuentra todas las luces que están encendidas (devuelve una lista)
         def luzOn = luces.findAll {it?.latestValue("switch") == 'on' }
+        //Ordena los elementos de la lista por la fecha en la que cambio de estado por ultima vez
         def orden = luzOn.sort {it.latestState?.date}
         def times = orden*.latestState.date
         log.debug "times: $orden orden:$times"
-        def i = luzOn.size, j = 0
-        while(i > 1 ){
+        def cont = luzOn.size, j = 0
+        while(cont > 1 ){
         	orden[j].off()
-            i = i - 1
+            cont = cont - 1
             j = j + 1
         }
     }

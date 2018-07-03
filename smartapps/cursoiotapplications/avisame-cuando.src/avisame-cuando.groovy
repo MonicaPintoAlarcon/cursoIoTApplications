@@ -37,7 +37,7 @@ def pagina2(){
     		input "pushYTelefono", "enum", title: "Tanto Push como SMS?", required: true, submitOnChange: true, options: ["Solo Push", "Solo SMS", "Push y SMS"]
     	}
     
-   		if (pushYTelefono == "Solo SMS" || pushYTelefono == "Push y SMS"){
+   		if (pushYTelefono == "1" || pushYTelefono == "2"){ //En el simulador no funciona con las cadenas de caracteres
 			section("Telefonos para mensaje SMS"){
 				input("receptores", "contact", title: "Enviar notifications a") {
                 	paragraph "Si esta fuera de US indique el codigo del Pais"

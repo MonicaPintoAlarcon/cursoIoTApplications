@@ -16,9 +16,10 @@
  
 import java.text.DecimalFormat
 
-// ID = IANDALUC230
-// KEY = csnkm3d9
+// ID = IMLAGA24
+// KEY = zyjjqshr
 // C = (F-32)/1.8
+// F = C*1.8 + 32
 definition(
     name: "Conectar SmartThings a una Estación Metereológica",
     namespace: "cursoIoTApplications",
@@ -34,7 +35,7 @@ definition(
 preferences {
     section("Select a sensor") {
         input "temp", "capability.temperatureMeasurement", title: "Temperature", required: true
-        input "humidity", "capability.relativeHumidityMeasurement", title: "Humidity", required: true
+        input "humidity", "capability.relativeHumidityMeasurement", title: "Humidity", required: false
     }
     section("Configure your Weather Underground credentials") {
         input "weatherID", "text", title: "Weather Station ID", defaultValue: "IANDALUC230", required: false
@@ -63,23 +64,24 @@ def initialize() {
 
 def updateCurrentWeather() {
     
-    log.trace "Temp: " + temp.currentTemperature
-    log.trace "Humidity: " + humidity.currentHumidity
+    log.info "$location.temperatureScale"
+    log.trace "Temp: " + temp?.currentTemperature
+    log.trace "Humidity: " + humidity?.currentHumidity
     //Dew Point : Punto de rocío, calculado en función de la temperatura y humedad actual
     //El punto de rocío o temperatura de rocío es la temperatura a la que empieza a condensarse 
     //el vapor de agua contenido en el aire, produciendo rocío, neblina, cualquier tipo de nube o, 
     //en caso de que la temperatura sea lo suficientemente baja, escarcha.
     log.trace "Dew Point: " + calculateDewPoint(temp.currentTemperature, humidity.currentHumidity)
-    
-    def params = [
-        uri: "http://weatherstation.wunderground.com",
+
+def params = [
+        uri: "http://wunderground.com",
         path: "/weatherstation/updateweatherstation.php",
         query: [
             "ID": weatherID,
             "PASSWORD": password,
             "dateutc": "now",
             "tempf": temp.currentTemperature,
-            "humidity": humidity.currentHumidity,
+            "humidity": humidity?.currentHumidity,
             "dewptf": calculateDewPoint(temp.currentTemperature, humidity.currentHumidity),
             "action": "updateraw",
             "softwaretype": "SmartThings"
@@ -88,6 +90,7 @@ def updateCurrentWeather() {
     
     if (temp.currentTemperature) {
         try {
+        	//sendPush("temp = ${temp.currentTemperature}")
             httpGet(params) { resp ->   
                 log.debug "response data: ${resp.data}"
             }

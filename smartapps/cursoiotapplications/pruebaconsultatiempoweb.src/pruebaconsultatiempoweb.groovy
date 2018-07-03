@@ -26,9 +26,7 @@ definition(
 
 preferences {
 	section("Title") {
-		// TODO: put inputs here
-        input "termostato","capability.thermostat",required:true
-        input "interruptor","capability.switch",required:true
+        input "aire","capability.switch", required:true
 	}
 }
 
@@ -54,25 +52,21 @@ def consultarTiempoJSON(){
         uri:  'http://api.openweathermap.org/data/2.5/',
         path: 'weather',
         contentType: 'application/json',
-        query: [lat:'36.572344', lon:'-4.602985', units: 'metric', APPID: 'b811614ad352ec866712a6e9439e3462']
+        query: [q:'Malaga', units: 'metric', APPID: 'b811614ad352ec866712a6e9439e3462']
         //q:'Malaga' para buscar por Ciudad
     ]
+    def temp 
     try {
         httpGet(params) {resp ->
             log.debug "resp data: ${resp.data}"
-            def temp = resp.data.main.temp
+            temp = resp.data.main.temp
             log.debug "temp: ${temp}"
         }
         
-        log.debug "termostato: ${termostato.currentThermostatMode}"
-        if (termostato.currentThermostatMode != 'heat' && temp < 10){
-        	termostato.heat()
-        }
-        
-        log.debug "interruptor: ${interruptor.currentSwitch}"
-        log.debug "interruptor: ${interruptor.switchState?.getValue()}"
-        if (interruptor.currentSwitch == 'off' && temp < 10){
-            interruptor.on()
+        log.debug "aire: ${aire.currentSwitch}"
+        log.debug "aire: ${aire.switchState?.getValue()}"
+        if (temp > 17){
+            aire.on()
         }
     } catch (e) {
         log.error "error: $e"

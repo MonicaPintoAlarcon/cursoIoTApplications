@@ -67,20 +67,22 @@ def comprobarLuces(){
 
 	//Se podría hacer también sin la variable de estado, usando un cierre para contar los elementos de la lista
     def c = luces.count {it?.latestValue("switch") == 'on'}
+    def c2 = luces.count {it?.latestState("switch")?.getValue() == 'on' }
     log.debug "numLuces = $c"
+    log.debug "numLuces = $c2"
     log.debug "numLuces = $state.numLuces"
 	
     if (state.numLuces > 1) {
     	log.debug "Apaga alguna luz"
         def luzOn = luces.findAll {it?.latestValue("switch") == 'on' }
+        log.debug "numLuces = ${luzOn.size()}" 
         def orden = luzOn.sort{it?.latestState?.date}
         def times = orden*.latestState.date
-        log.debug "times: $orden orden:$times"
-        def i = luzOn.size, j = 0
-        while(i > 1 ){
-        	orden[j].off()
-            i = i - 1
-            j = j + 1
+        log.debug "times: $times orden:$orden"
+        def i = 0
+        while(i < luzOn.size - 1 ){
+        	orden[i].off()
+            i = i + 1
         }
     }
 }

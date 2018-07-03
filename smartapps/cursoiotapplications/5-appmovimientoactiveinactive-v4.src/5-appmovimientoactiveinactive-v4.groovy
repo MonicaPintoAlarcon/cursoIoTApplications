@@ -73,11 +73,12 @@ def checkMotion() {
 
     // get the current state object for the motion sensor
     def motionState = themotion.currentState("motion")
+    log.debug "motionState = $motionState"
 
     if (motionState.value == "inactive") {
-            // get the time elapsed between now and when the motion reported inactive
+        // get the time elapsed between now and when the motion reported inactive
         def elapsed = now() - motionState.date.time
-
+		log.debug "Elapsed time: $elapsed"
         // elapsed time is in milliseconds, so the threshold must be converted to milliseconds too
         def threshold = 1000 * 60 * minutes
 

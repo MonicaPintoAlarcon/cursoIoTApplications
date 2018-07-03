@@ -56,6 +56,7 @@ def listSwitches(){
 def updateSwitches(){
     // use the built-in request object to get the command parameter
     def command = params.command
+    log.debug "$params"
 	log.debug "$command"    
     // all switches have the command
     // execute the command on all switches

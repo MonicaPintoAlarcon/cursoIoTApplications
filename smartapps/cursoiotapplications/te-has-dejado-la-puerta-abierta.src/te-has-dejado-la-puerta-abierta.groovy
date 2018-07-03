@@ -17,7 +17,7 @@ definition(
 preferences {
 
 	section("Monitor this door or window") {
-		input "contact", "capability.contactSensor"
+		input "contact", "capability.contactSensor", multiple:true
 	}
 	section("And notify me if it's open for more than this many minutes (default 10)") {
 		input "openThreshold", "number", description: "Number of minutes", required: false
@@ -31,16 +31,16 @@ preferences {
 
 def installed() {
 	log.trace "installed()"
-	subscribe()
+	initialize()
 }
 
 def updated() {
 	log.trace "updated()"
 	unsubscribe()
-	subscribe()
+	initialize()
 }
 
-def subscribe() {
+def initialize() {
 	subscribe(contact, "contact.open", doorOpen)
 	subscribe(contact, "contact.closed", doorClosed)
 }
@@ -67,7 +67,8 @@ def doorOpenTooLong() {
 	//def contactState = contact.currentState("contact")
     def contactState = contact.contactState
   
-	if (contactState.value == "open") {
+	//if (contactState.value == "open") { //VALIDO SI SOLO HAY UNA PUERTA/VENTANA
+    if (contactState.any {it.value == "open"}){
     	//Devuelve el tiempo en milisegundos
 		def elapsed = now() - contactState.rawDateCreated.time
         log.debug "rawDateCreated.time = $contactState.rawDateCreated.time"
