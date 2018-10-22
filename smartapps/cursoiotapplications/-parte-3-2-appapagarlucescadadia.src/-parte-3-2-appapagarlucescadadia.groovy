@@ -1,7 +1,7 @@
 /**
- *  pruebaPaginasDinamicas(una sola pagina que se refresca)
+ *  AppApagarLucesCadaDia
  *
- *  Copyright 2016 Monica Pinto
+ *  Copyright 2017 Monica Pinto
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -14,32 +14,21 @@
  *
  */
 definition(
-    name: "pruebaPaginasDinamicas(una sola pagina que se refresca)",
-    namespace: "pruebas",
+    name: "(Parte 3) 2. AppApagarLucesCadaDia",
+    namespace: "cursoIoTApplications",
     author: "Monica Pinto",
-    description: "Una sola p\u00E1gina din\u00E1mica que se refresca",
-    category: "My Apps",
+    description: "Apaga las luces cada d\u00EDa a una hora concreta, usando schedule",
+    category: "Green Living",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
     iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
 
 
 preferences {
-	page(name:"paginaDin", title:"Una sola pagina dinamica", uninstall:true)
-}
-
-def paginaDin(){
-	dynamicPage(name:"paginaDin"){
-	    section() {
-			input("tipoNotificacion","enum",options: ["push","sms","ambos"],title:"Tipo?",submitOnChange:true)
-		}
-
-		if (tipoNotificacion == "sms" || tipoNotification == "1" || tipoNotificacion == "ambos" || tipoNotification == "2"){
-        	section (){
-            	input ("receptores", "contact", title:"Selecciona los contactos")
-            }
-        }
-    }
+	section("Title") {
+    	input "luces", "capability.switch", title: "Introduce las luces que quieres apagar", required:true, multiple:true
+		input "hora", "time", title:"Introduce hora del dia a la que se apagaran las luces", required:true
+	}
 }
 
 def installed() {
@@ -56,7 +45,13 @@ def updated() {
 }
 
 def initialize() {
-	// TODO: subscribe to attributes, devices, locations, etc.
+	log.debug "Planificando tarea..."
+    //Vamos a planificarlo para que lo haga cada dia 2 minutos despues de la hora indicada: 2 minutos = 120000 msegundos
+    schedule(hora+120000, tareaDiaria)
 }
 
 // TODO: implement event handlers
+def tareaDiaria(){
+	log.debug "Tarea diara en ejecucion..."
+	luces.off()
+}

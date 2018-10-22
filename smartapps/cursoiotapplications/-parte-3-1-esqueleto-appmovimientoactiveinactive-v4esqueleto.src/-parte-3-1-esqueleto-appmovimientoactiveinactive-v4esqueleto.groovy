@@ -1,5 +1,5 @@
 /**
- *  pruebaPaginasDinamicas(una sola pagina que se refresca)
+ *  AppMovimientoActiveInactive-v4Esqueleto
  *
  *  Copyright 2016 Monica Pinto
  *
@@ -14,37 +14,30 @@
  *
  */
 definition(
-    name: "pruebaPaginasDinamicas(una sola pagina que se refresca)",
-    namespace: "pruebas",
+    name: "(Parte 3) 1.esqueleto. AppMovimientoActiveInactive-v4Esqueleto",
+    namespace: "cursoIoTApplications",
     author: "Monica Pinto",
-    description: "Una sola p\u00E1gina din\u00E1mica que se refresca",
+    description: "Esta ser\u00EDa la versi\u00F3n completa de la aplicaci\u00F3n",
     category: "My Apps",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
     iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
 
-
 preferences {
-	page(name:"paginaDin", title:"Una sola pagina dinamica", uninstall:true)
-}
-
-def paginaDin(){
-	dynamicPage(name:"paginaDin"){
-	    section() {
-			input("tipoNotificacion","enum",options: ["push","sms","ambos"],title:"Tipo?",submitOnChange:true)
-		}
-
-		if (tipoNotificacion == "sms" || tipoNotification == "1" || tipoNotificacion == "ambos" || tipoNotification == "2"){
-        	section (){
-            	input ("receptores", "contact", title:"Selecciona los contactos")
-            }
-        }
+	section("Listen to this motion detector:") {
+        input "themotion", "capability.motionSensor", required: true, title: "When?"
+    }
+    section("Turn on this light") {
+        input "theswitch", "capability.switch", required: true
+    }
+    //Nuevo de esta versión
+    section("Minutes to wait before turning off the light"){
+    	input "minutes", "number", required: true, title: "Minutes?"
     }
 }
 
 def installed() {
 	log.debug "Installed with settings: ${settings}"
-
 	initialize()
 }
 
@@ -57,6 +50,22 @@ def updated() {
 
 def initialize() {
 	// TODO: subscribe to attributes, devices, locations, etc.
+    subscribe(themotion,"motion.active",motionActiveDetectedHandler)
+    subscribe(themotion,"motion.inactive",motionInactiveDetectedHandler)
 }
 
 // TODO: implement event handlers
+def motionActiveDetectedHandler(evt){
+	log.debug "motionDetectedHandler called: $evt"
+    theswitch.on()
+}
+
+//La implementación del manejador de eventos es diferente en esta versión
+def motionInactiveDetectedHandler(evt){
+    log.debug "motionDetectedHandler called: $evt"
+    //COMPLETAR
+}
+
+def checkMotion() { //Metodo que se llama cuando pase el tiempo estimado
+    //COMPLETAR
+}

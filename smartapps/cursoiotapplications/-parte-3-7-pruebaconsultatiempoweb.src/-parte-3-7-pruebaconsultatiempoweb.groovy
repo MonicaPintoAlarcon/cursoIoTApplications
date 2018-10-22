@@ -1,5 +1,5 @@
 /**
- *  pruebaPaginasDinamicas(una sola pagina que se refresca)
+ *  PruebaConsultaTiempoWeb
  *
  *  Copyright 2016 Monica Pinto
  *
@@ -14,32 +14,20 @@
  *
  */
 definition(
-    name: "pruebaPaginasDinamicas(una sola pagina que se refresca)",
-    namespace: "pruebas",
+    name: "(Parte 3) 7. PruebaConsultaTiempoWeb",
+    namespace: "cursoIoTApplications",
     author: "Monica Pinto",
-    description: "Una sola p\u00E1gina din\u00E1mica que se refresca",
-    category: "My Apps",
+    description: "Prueba de acceso a servicio web externo",
+    category: "Convenience",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
     iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
 
 
 preferences {
-	page(name:"paginaDin", title:"Una sola pagina dinamica", uninstall:true)
-}
-
-def paginaDin(){
-	dynamicPage(name:"paginaDin"){
-	    section() {
-			input("tipoNotificacion","enum",options: ["push","sms","ambos"],title:"Tipo?",submitOnChange:true)
-		}
-
-		if (tipoNotificacion == "sms" || tipoNotification == "1" || tipoNotificacion == "ambos" || tipoNotification == "2"){
-        	section (){
-            	input ("receptores", "contact", title:"Selecciona los contactos")
-            }
-        }
-    }
+	section("Title") {
+        input "aire","capability.switch", required:true
+	}
 }
 
 def installed() {
@@ -56,7 +44,31 @@ def updated() {
 }
 
 def initialize() {
-	// TODO: subscribe to attributes, devices, locations, etc.
+    runEvery30Minutes(consultarTiempoJSON)
 }
 
-// TODO: implement event handlers
+def consultarTiempoJSON(){
+	def params = [
+        uri:  'http://api.openweathermap.org/data/2.5/',
+        path: 'weather',
+        contentType: 'application/json',
+        query: [q:'Málaga', units: 'metric', APPID: 'b811614ad352ec866712a6e9439e3462']
+        //q:'Malaga' para buscar por Ciudad
+    ]
+    def temp 
+    try {
+        httpGet(params) {resp ->
+            log.debug "resp data: ${resp.data}"
+            temp = resp.data.main.temp
+            log.debug "temp: ${temp}"
+        }
+        
+        log.debug "aire: ${aire.currentSwitch}"
+        log.debug "aire: ${aire.switchState?.getValue()}"
+        if (temp > 17){
+            aire.on()
+        }
+    } catch (e) {
+        log.error "error: $e"
+    }
+}

@@ -21,17 +21,17 @@ preferences {
 			input "presencia", "capability.presenceSensor", title: "Llegada/Marcha de", required: true, multiple: false
 		}
 		section("Envia este mensaje cuando alguien llega (opcional, envia un mensaje estandar si este no se especifica)"){
-			input "textoMensajeLlegada", "text", title: "Texto del Mensaje", required: false
+			input "textoMensajeLlegada", "text", title: "Texto del Mensaje", required: false, defaultValue: "Mensaje llegada por defecto"
 		}
         section("Envia este mensaje cuando alguien se marcha (opcional, envia un mensaje estandar si este no se especifica)"){
-			input "textoMensajeMarcha", "text", title: "Texto del Mensaje", required: false
+			input "textoMensajeMarcha", "text", title: "Texto del Mensaje", required: false, defaultValue: "Mensaje salida por defecto"
 		}
         section("Elige la franja horaria"){
         	input "horaInicio", "time", title: "Hora de inicio", required: true
             input "horaFin","time",title: "Hora de finalizacion", required: true
         }
         section("Elige el modo o modos en el que recibir las notificaciones"){
-     		mode name: "modo", title: "Selecciona el Modo:", required: true, multiple:true
+     		mode name:"modo", title: "Selecciona el Modo:", required: true, multiple:false
         }
     }
     
@@ -90,16 +90,24 @@ private sendMessage(evt) {
     /** Aunque horaInicio y horaFin están en la hora local, evt.date devuelve la hora UTC.
         Sin embargo, el método timeOfDayIsBetween hace las conversiones necesarias usando
         la zona horaria pasada como último parámetro **/
-    if (timeOfDayIsBetween(horaInicio, horaFin, evt.date, location.timeZone) && location.mode in modo){ 
-        if (evt.value == "present" && textoMensaje){
+    if (timeOfDayIsBetween(horaInicio, horaFin, evt.date, location.timeZone) && location.mode == modo){ 
+    //if (timeOfDayIsBetween(horaInicio, horaFin, evt.date, location.timeZone)){ //Si el modo no funciona y se inicializa a null
+        if (evt.value == "present" && textoMensajeLlegada){
     		msg = textoMensajeLlegada
-    	}else if (evt.value == "present" && !textoMensaje){
+    	}else if (evt.value == "present" && !textoMensajeLlegada){
     		msg = "Alguien ha llegado a $location"
-    	}else if (evt.value == "not present" && textoMensaje){
+    	}else if (evt.value == "not present" && textoMensajeSalida){
     		msg = textoMensajeSalida
     	}else
 			msg = "Alguien se ha marchado de $location"
-
+		
+        
+        /* Si funcionara el valor por defecto para los mensajes
+        if (evt.value == "present")
+        	msg = textoMensajeLlegada
+        else
+        	msg = textoMensajeSalida
+        */
 		log.debug "$evt.name:$evt.value, pushAndPhone:$pushAndPhone, '$msg'"
 
 		if (pushYTelefono == "Solo Push"){

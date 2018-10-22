@@ -1,7 +1,7 @@
 /**
- *  pruebaPaginasDinamicas(una sola pagina que se refresca)
+ *  PruebaWebApp-v3
  *
- *  Copyright 2016 Monica Pinto
+ *  Copyright 2017 Monica Pinto
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -14,33 +14,50 @@
  *
  */
 definition(
-    name: "pruebaPaginasDinamicas(una sola pagina que se refresca)",
-    namespace: "pruebas",
+    name: "PruebaWebApp-v3",
+    namespace: "MonicaPintoAlarcon",
     author: "Monica Pinto",
-    description: "Una sola p\u00E1gina din\u00E1mica que se refresca",
-    category: "My Apps",
+    description: "prueba web",
+    category: "Green Living",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
     iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
 
 
 preferences {
-	page(name:"paginaDin", title:"Una sola pagina dinamica", uninstall:true)
+	section("Title") {
+		// TODO: put inputs here
+        input "switches", "capability.switch", multiple:true, required:true
+	}
 }
 
-def paginaDin(){
-	dynamicPage(name:"paginaDin"){
-	    section() {
-			input("tipoNotificacion","enum",options: ["push","sms","ambos"],title:"Tipo?",submitOnChange:true)
-		}
-
-		if (tipoNotificacion == "sms" || tipoNotification == "1" || tipoNotificacion == "ambos" || tipoNotification == "2"){
-        	section (){
-            	input ("receptores", "contact", title:"Selecciona los contactos")
-            }
-        }
+mappings{
+	path("/switches"){
+    	action: [ GET: "listSwitches" ]
+    }
+    path("/switches/:command"){
+    	action: [PUT: "updateSwitches"]
     }
 }
+
+def listSwitches(){
+	def resp = [] //Creamos mapa vacio
+    switches.each{
+    	resp << [name: it.displayName, value: it.currentValue("switch")]
+    }
+    log.debug resp
+    return resp
+}
+
+def updateSwitches(){
+	def command = params.command
+    switch(command){
+    	case "on": switches.on(); break
+        case "off": switches.off(); break
+        default: httpError(400, "$command is not a valid command for the specified switches")
+    }
+}
+
 
 def installed() {
 	log.debug "Installed with settings: ${settings}"
